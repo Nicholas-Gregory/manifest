@@ -253,6 +253,353 @@ class Vector4D extends Vector
     }
 }
 
+abstract class Matrix
+{
+    abstract add_elements(matrix: Matrix): Matrix;
+    abstract subtract_elements(matrix: Matrix): Matrix;
+    abstract scale(factor: number): Matrix;
+    constructor()
+    {
+
+    }
+}
+
+interface matrix_data
+{
+    xa: number;
+    ya: number;
+    za?: number;
+    wa?: number;
+    xb: number;
+    yb: number;
+    zb?: number;
+    wb?: number;
+    xc?: number;
+    yc?: number;
+    zc?: number;
+    wc?: number;
+    xd?: number;
+    yd?: number;
+    zd?: number;
+    wd?: number;
+}
+
+class Matrix2x2 extends Matrix
+{
+    xa: number = 0;
+    ya: number = 0;
+    xb: number = 0;
+    yb: number = 0;
+
+    constructor()
+    constructor(xa: number, ya: number, xb: number, yb: number)
+    constructor(vector_a: Vector2D, vector_b: Vector2D)
+    constructor(data: number[])
+    constructor(data: matrix_data)
+    constructor(xaOrVec1OrData?: number | Vector2D | number[] | matrix_data, yaOrVec2?: number | Vector2D, xb?: number, yb?: number)
+    {
+        super();
+        if ((typeof xaOrVec1OrData === "number") && (typeof yaOrVec2 === "number") && (typeof xb === "number") && (typeof yb === "number"))
+        {
+            //constructor 2
+            this.xa = xaOrVec1OrData;
+            this.ya = yaOrVec2;
+            this.xb = xb;
+            this.yb = yb;
+        } else if (typeof xaOrVec1OrData === "object")
+        { 
+            if ("x" in xaOrVec1OrData)
+            {
+                if (typeof yaOrVec2 === "object")
+                {
+                    //constructor 3
+                    this.xa = xaOrVec1OrData.x;
+                    this.ya = xaOrVec1OrData.y;
+                    this.xb = yaOrVec2.x;
+                    this.yb = yaOrVec2.y;
+                }
+            } else if ("xa" in xaOrVec1OrData)
+            {
+                //constructor 5
+                this.xa = xaOrVec1OrData.xa;
+                this.ya = xaOrVec1OrData.ya;
+                this.xb = xaOrVec1OrData.xb;
+                this.yb = xaOrVec1OrData.yb;
+            } else
+            {
+                //constructor 4
+                this.xa = xaOrVec1OrData[0];
+                this.ya = xaOrVec1OrData[1];
+                this.xb = xaOrVec1OrData[2];
+                this.yb = xaOrVec1OrData[3];
+            }
+        }
+    }
+
+    add_elements(matrix: Matrix2x2): Matrix2x2 
+    {
+        return new Matrix2x2(this.xa + matrix.xa, this.ya + matrix.ya, this.xb + matrix.xb, this.yb + matrix.yb);
+    }
+    subtract_elements(matrix: Matrix2x2): Matrix2x2 
+    {
+        return new Matrix2x2(this.xa - matrix.xa, this.ya - matrix.ya, this.xb - matrix.xb, this.yb - matrix.yb);
+    }
+    scale(factor: number): Matrix2x2 
+    {
+        return new Matrix2x2(this.xa * factor, this.ya * factor, this.xb * factor, this.yb * factor);
+    }
+}
+
+class Matrix3x3 extends Matrix
+{
+    xa = 0;
+    ya = 0;
+    za = 0;
+    xb = 0;
+    yb = 0;
+    zb = 0;
+    xc = 0;
+    yc = 0;
+    zc = 0;
+    constructor()
+    constructor(xa: number, ya: number, za: number,
+        xb: number, yb: number, zb: number,
+        xc: number, yc: number, zc: number)
+    constructor(vector_a: Vector3D, vector_b: Vector3D, vector_c: Vector3D)
+    constructor(data: number[])
+    constructor(data: matrix_data)
+    constructor(xaOrVec1OrData?: number | Vector3D | number[] | matrix_data, yaOrVec2?: number | Vector3D, zaOrVec3?: number | Vector3D,
+        xb?: number, yb?: number, zb?: number,
+        xc?: number, yc?: number, zc?: number)
+    {
+        super();
+        if ((typeof xaOrVec1OrData === "number") && (typeof yaOrVec2 === "number") && (typeof zaOrVec3 === "number") &&
+            (typeof xb === "number") && (typeof yb === "number") && (typeof zb === "number") &&
+            (typeof xc === "number") && (typeof yc === "number") && (typeof zc === "number"))
+        {
+            //constructor 2
+            this.xa = xaOrVec1OrData;
+            this.ya = yaOrVec2;
+            this.za = zaOrVec3;
+            this.xb = xb;
+            this.yb = yb;
+            this.zb = zb;
+            this.xc = xc;
+            this.yc = yc;
+            this.zc = zc;
+        } else if (typeof xaOrVec1OrData === "object")
+        {
+            if ("x" in xaOrVec1OrData)
+            {
+                if ((typeof yaOrVec2 === "object") && (typeof zaOrVec3 === "object"))
+                {
+                    //constructor 3
+                    this.xa = xaOrVec1OrData.x;
+                    this.ya = xaOrVec1OrData.y;
+                    this.za = xaOrVec1OrData.z;
+                    this.xb = yaOrVec2.x;
+                    this.yb = yaOrVec2.y;
+                    this.zb = yaOrVec2.z;
+                    this.xc = zaOrVec3.x;
+                    this.yc = zaOrVec3.y;
+                    this.zc = zaOrVec3.z;
+                }
+            } else if ("xa" in xaOrVec1OrData)
+            {
+                //constructor 5
+                if ((typeof xaOrVec1OrData.za !== "undefined") && (typeof xaOrVec1OrData.zb !== "undefined") && (typeof xaOrVec1OrData.xc !== "undefined") &&
+                    (typeof xaOrVec1OrData.yc !== "undefined") && (typeof xaOrVec1OrData.zc !== "undefined"))
+                {
+                    this.xa = xaOrVec1OrData.xa;
+                    this.ya = xaOrVec1OrData.ya;
+                    this.za = xaOrVec1OrData.za;
+                    this.xb = xaOrVec1OrData.xb;
+                    this.yb = xaOrVec1OrData.yb;
+                    this.zb = xaOrVec1OrData.zb;
+                    this.xc = xaOrVec1OrData.xc;
+                    this.yc = xaOrVec1OrData.yc;
+                    this.zc = xaOrVec1OrData.zc;
+                }
+            } else
+            {
+                this.xa = xaOrVec1OrData[0];
+                this.ya = xaOrVec1OrData[1];
+                this.za = xaOrVec1OrData[2];
+                this.xb = xaOrVec1OrData[3];
+                this.yb = xaOrVec1OrData[4];
+                this.zb = xaOrVec1OrData[5];
+                this.xc = xaOrVec1OrData[6];
+                this.yc = xaOrVec1OrData[7];
+                this.zc = xaOrVec1OrData[8];
+            }
+        }
+    }
+    add_elements(matrix: Matrix3x3): Matrix3x3 
+    {
+        return new Matrix3x3(this.xa + matrix.xa, this.ya + matrix.ya, this.za + matrix.za, this.xb + matrix.xb, this.yb + matrix.yb, this.zb + matrix.zb,
+            this.xc + matrix.xc, this.yc + matrix.yc, this.zc + matrix.zc);
+    }
+    subtract_elements(matrix: Matrix3x3): Matrix3x3 
+    {
+        return new Matrix3x3(this.xa - matrix.xa, this.ya - matrix.ya, this.za - matrix.za, this.xb - matrix.xb, this.yb - matrix.yb, this.zb - matrix.zb,
+            this.xc - matrix.xc, this.yc - matrix.yc, this.zc - matrix.zc);
+    }
+    scale(factor: number): Matrix3x3 
+    {
+        return new Matrix3x3(this.xa * factor, this.ya * factor, this.za * factor, this.xb * factor, this.yb * factor, this.zb * factor,
+            this.xc * factor, this.yc * factor, this.zc * factor);
+    }
+}
+
+class Matrix4x4 extends Matrix
+{
+    xa = 0;
+    ya = 0
+    za = 0;
+    wa = 0;
+    xb = 0;
+    yb = 0;
+    zb = 0;
+    wb = 0;
+    xc = 0;
+    yc = 0;
+    zc = 0;
+    wc = 0;
+    xd = 0;
+    yd = 0;
+    zd = 0;
+    wd = 0;
+    constructor()
+    constructor(xa: number, ya: number, za: number, wa: number,
+        xb: number, yb: number, zb: number, wb: number,
+        xc: number, yc: number, zc: number, wc: number,
+        xd: number, yd: number, zd: number, wd: number)
+    constructor(vector_a: Vector4D, vector_b: Vector4D, vector_c: Vector4D, vector_d: Vector4D)
+    constructor(data: number[])
+    constructor(data: matrix_data)
+    constructor(xaOrVec1OrData?: number | Vector4D | number[] | matrix_data, yaOrVec2?: number | Vector4D, zaOrVec3?: number | Vector4D, waOrVec3?: number | Vector4D,
+        xb?: number, yb?: number, zb?: number, wb?: number,
+        xc?: number, yc?: number, zc?: number, wc?: number,
+        xd?: number, yd?: number, zd?: number, wd?: number)
+    {
+        super();
+        if ((typeof xaOrVec1OrData === "number") && (typeof yaOrVec2 === "number") && (typeof zaOrVec3 === "number") && (typeof waOrVec3 === "number") &&
+        (typeof xb === "number") && (typeof yb === "number") && (typeof zb === "number") && (typeof wb === "number") &&
+        (typeof xc === "number") && (typeof yc === "number") && (typeof zc === "number") && (typeof wc === "number") &&
+        (typeof xd === "number") && (typeof yd === "number") && (typeof zd === "number") && (typeof wd === "number"))
+        {
+            //constructor 2
+            this.xa = xaOrVec1OrData;
+            this.ya = yaOrVec2;
+            this.za = zaOrVec3;
+            this.wa = waOrVec3;
+            this.xb = xb;
+            this.yb = yb;
+            this.zb = zb;
+            this.wb = wb;
+            this.xc = xc;
+            this.yc = yc;
+            this.zc = zc;
+            this.wc = wc;
+            this.xd = xd;
+            this.yd = yd;
+            this.zd = zd;
+            this.wd = wd;
+        } else if (typeof xaOrVec1OrData === "object")
+        {
+            if ("x" in xaOrVec1OrData)
+            {
+                if ((typeof yaOrVec2 == "object") && (typeof zaOrVec3 === "object") && (typeof waOrVec3 === "object"))
+                {
+                    //constructor 3
+                    this.xa = xaOrVec1OrData.x;
+                    this.ya = xaOrVec1OrData.y;
+                    this.za = xaOrVec1OrData.z;
+                    this.wa = xaOrVec1OrData.w;
+                    this.xb = yaOrVec2.x;
+                    this.yb = yaOrVec2.y;
+                    this.zb = yaOrVec2.z;
+                    this.wb = yaOrVec2.w;
+                    this.xc = zaOrVec3.x;
+                    this.yc = zaOrVec3.y;
+                    this.zc = zaOrVec3.z;
+                    this.wc = zaOrVec3.w;
+                    this.xd = waOrVec3.x;
+                    this.yd = waOrVec3.y;
+                    this.zd = waOrVec3.z;
+                    this.wd = waOrVec3.w;
+                }
+            } else if ("xa" in xaOrVec1OrData)
+            {
+                if ((typeof xaOrVec1OrData.za !== "undefined") && (typeof xaOrVec1OrData.wa !== "undefined") && (typeof xaOrVec1OrData.zb !== "undefined") && 
+                (typeof xaOrVec1OrData.wb !== "undefined") && (typeof xaOrVec1OrData.xc !== "undefined") && (typeof xaOrVec1OrData.wc !== "undefined") &&
+                (typeof xaOrVec1OrData.yc !== "undefined") && (typeof xaOrVec1OrData.zc !== "undefined") && (typeof xaOrVec1OrData.xd !== "undefined") &&
+                (typeof xaOrVec1OrData.yd !== "undefined") && (typeof xaOrVec1OrData.zd !== "undefined") && (typeof xaOrVec1OrData.wd !== "undefined"))
+                {
+                    //constructor 5
+                    this.xa = xaOrVec1OrData.xa;
+                    this.ya = xaOrVec1OrData.ya;
+                    this.za = xaOrVec1OrData.za;
+                    this.wa = xaOrVec1OrData.wa;
+                    this.xb = xaOrVec1OrData.xb;
+                    this.yb = xaOrVec1OrData.yb;
+                    this.zb = xaOrVec1OrData.zb;
+                    this.wb = xaOrVec1OrData.wb;
+                    this.xc = xaOrVec1OrData.xc;
+                    this.yc = xaOrVec1OrData.yc;
+                    this.zc = xaOrVec1OrData.zc;
+                    this.wc = xaOrVec1OrData.wc;
+                    this.xd = xaOrVec1OrData.xd;
+                    this.yd = xaOrVec1OrData.yd;
+                    this.zd = xaOrVec1OrData.zd;
+                    this.wd = xaOrVec1OrData.wd;
+                }
+            } else
+            {
+                //constructor 4
+                this.xa = xaOrVec1OrData[0];
+                this.ya = xaOrVec1OrData[1];
+                this.za = xaOrVec1OrData[2];
+                this.wa = xaOrVec1OrData[3];
+                this.xb = xaOrVec1OrData[4];
+                this.yb = xaOrVec1OrData[5];
+                this.zb = xaOrVec1OrData[6];
+                this.wb = xaOrVec1OrData[7];
+                this.xc = xaOrVec1OrData[8];
+                this.yc = xaOrVec1OrData[9];
+                this.zc = xaOrVec1OrData[10];
+                this.wc = xaOrVec1OrData[11];
+                this.xd = xaOrVec1OrData[12];
+                this.yd = xaOrVec1OrData[13];
+                this.zd = xaOrVec1OrData[14];
+                this.wd = xaOrVec1OrData[15];
+            }
+        }
+
+    }
+    add_elements(matrix: Matrix4x4): Matrix4x4 
+    {
+        return new Matrix4x4(this.xa + matrix.xa, this.ya + matrix.ya, this.za + matrix.za, this.wa + matrix.wa,
+            this.xb + matrix.xb, this.yb + matrix.yb, this.zb + matrix.zb, this.wb + matrix.wb, 
+            this.xc + matrix.xc, this.yc + matrix.yc, this.zc + matrix.zc, this.wc + matrix.wc,
+            this.xd + matrix.xd, this.yd + matrix.yd, this.zd + matrix.zd, this.wd + matrix.wd);
+    }
+    subtract_elements(matrix: Matrix4x4): Matrix4x4 
+    {
+        return new Matrix4x4(this.xa - matrix.xa, this.ya - matrix.ya, this.za - matrix.za, this.wa - matrix.wa,
+            this.xb - matrix.xb, this.yb - matrix.yb, this.zb - matrix.zb, this.wb - matrix.wb, 
+            this.xc - matrix.xc, this.yc - matrix.yc, this.zc - matrix.zc, this.wc - matrix.wc,
+            this.xd - matrix.xd, this.yd - matrix.yd, this.zd - matrix.zd, this.wd - matrix.wd);
+    }
+    scale(factor: number): Matrix4x4 
+    {
+        return new Matrix4x4(this.xa * factor, this.ya * factor, this.za * factor, this.wa * factor,
+            this.xb * factor, this.yb * factor, this.zb * factor, this.wb * factor,
+            this.xc * factor, this.yc * factor, this.zc * factor, this.wc * factor,
+            this.xd * factor, this.yd * factor, this.zd * factor, this.wd * factor);
+    }
+}
+
 //tests
 let vec2 = new Vector2D(2, 3);
 console.log("Initialized via values in constructor: x: " + vec2.x + " y: " + vec2.y);
