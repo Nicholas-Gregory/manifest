@@ -8,6 +8,10 @@ abstract class Vector
     abstract negate(): Vector;
     abstract dot_product(vector: Vector): number;
     abstract equals(vector: Vector): boolean;
+    angle(vector: Vector): number
+    {
+        return Math.acos(this.normalize().dot_product(vector.normalize()));
+    }
     constructor()
     {
 
@@ -30,7 +34,8 @@ class Vector2D extends Vector
     constructor(x: number, y: number)
     constructor(data: vector_data)
     constructor(data: number[])
-    constructor(xOrData?: number | vector_data | number[], y?: number)
+    constructor(vector: Vector2D)
+    constructor(xOrData?: number | vector_data | number[] | Vector2D, y?: number)
     {
         super();
         if ((typeof xOrData === "number") && (typeof y === "number")) {
@@ -42,7 +47,12 @@ class Vector2D extends Vector
             {
                 this.x = xOrData.x;
                 this.y = xOrData.y;
-            } else 
+            } else if(xOrData instanceof Vector2D)
+            {
+                this.x = xOrData.x;
+                this.y = xOrData.y;
+            } 
+            else 
             {
                 this.x = xOrData[0];
                 this.y = xOrData[1];
@@ -94,7 +104,8 @@ class Vector3D extends Vector
     constructor(data: vector_data)
     constructor(data: number[])
     constructor(x: number, y: number, z: number)
-    constructor(xOrData?: number | vector_data |  number[], y?:number, z?: number)
+    constructor(vector: Vector3D)
+    constructor(xOrData?: number | vector_data |  number[] | Vector3D, y?:number, z?: number)
     {
         super();
         if ((typeof xOrData === "number") && (typeof y === "number") && (typeof z === "number"))
@@ -115,7 +126,13 @@ class Vector3D extends Vector
                 {
                     throw "3D vectors require a z component";
                 }
-            } else 
+            } else if (xOrData instanceof Vector3D)
+            {
+                this.x = xOrData.x;
+                this.y = xOrData.y;
+                this.z = xOrData.z;
+            } 
+            else 
             {
                 if (xOrData.length === 3)
                 {
@@ -179,7 +196,8 @@ class Vector4D extends Vector
     constructor(data: vector_data)
     constructor(data: number[])
     constructor(x: number, y: number, z: number, w: number)
-    constructor(xOrData?: number | vector_data | number[], y?: number, z?: number, w?: number)
+    constructor(vector: Vector4D)
+    constructor(xOrData?: number | vector_data | number[] | Vector4D, y?: number, z?: number, w?: number)
     {
         super();
         if ((typeof xOrData === "number") && (typeof y === "number") && (typeof z === "number") && (typeof w === "number"))
@@ -202,7 +220,14 @@ class Vector4D extends Vector
                 {
                     throw "4D vectors require a z and w component";
                 }
-            } else
+            } else if (xOrData instanceof Vector4D)
+            {
+                this.x = xOrData.x;
+                this.y = xOrData.y;
+                this.z = xOrData.z;
+                this.w = xOrData.w;
+            } 
+            else
             {
                 if (xOrData.length === 4)
                 {
@@ -258,6 +283,8 @@ abstract class Matrix
     abstract add_elements(matrix: Matrix): Matrix;
     abstract subtract_elements(matrix: Matrix): Matrix;
     abstract scale(factor: number): Matrix;
+    abstract multiply_by_vector(vector: Vector): Vector;
+    abstract multiply_by_matrix(matrix: Matrix): Matrix;    
     constructor()
     {
 
@@ -296,12 +323,12 @@ class Matrix2x2 extends Matrix
     constructor(vector_a: Vector2D, vector_b: Vector2D)
     constructor(data: number[])
     constructor(data: matrix_data)
-    constructor(xaOrVec1OrData?: number | Vector2D | number[] | matrix_data, yaOrVec2?: number | Vector2D, xb?: number, yb?: number)
+    constructor(matrix: Matrix2x2)
+    constructor(xaOrVec1OrData?: number | Vector2D | number[] | matrix_data | Matrix2x2, yaOrVec2?: number | Vector2D, xb?: number, yb?: number)
     {
         super();
         if ((typeof xaOrVec1OrData === "number") && (typeof yaOrVec2 === "number") && (typeof xb === "number") && (typeof yb === "number"))
         {
-            //constructor 2
             this.xa = xaOrVec1OrData;
             this.ya = yaOrVec2;
             this.xb = xb;
@@ -312,7 +339,6 @@ class Matrix2x2 extends Matrix
             {
                 if (typeof yaOrVec2 === "object")
                 {
-                    //constructor 3
                     this.xa = xaOrVec1OrData.x;
                     this.ya = xaOrVec1OrData.y;
                     this.xb = yaOrVec2.x;
@@ -320,14 +346,19 @@ class Matrix2x2 extends Matrix
                 }
             } else if ("xa" in xaOrVec1OrData)
             {
-                //constructor 5
                 this.xa = xaOrVec1OrData.xa;
                 this.ya = xaOrVec1OrData.ya;
                 this.xb = xaOrVec1OrData.xb;
                 this.yb = xaOrVec1OrData.yb;
-            } else
+            } else if (xaOrVec1OrData instanceof Matrix2x2)
             {
-                //constructor 4
+                this.xa = xaOrVec1OrData.xa;
+                this.ya = xaOrVec1OrData.ya;
+                this.xb = xaOrVec1OrData.xb;
+                this.yb = xaOrVec1OrData.yb;
+            } 
+            else
+            {
                 this.xa = xaOrVec1OrData[0];
                 this.ya = xaOrVec1OrData[1];
                 this.xb = xaOrVec1OrData[2];
@@ -347,6 +378,16 @@ class Matrix2x2 extends Matrix
     scale(factor: number): Matrix2x2 
     {
         return new Matrix2x2(this.xa * factor, this.ya * factor, this.xb * factor, this.yb * factor);
+    }
+    multiply_by_vector(vector: Vector2D): Vector2D 
+    {
+        return new Vector2D(this.xa * vector.x + this.xb * vector.y,
+            this.ya * vector.x + this.yb * vector.y);
+    }
+    multiply_by_matrix(matrix: Matrix2x2): Matrix2x2 
+    {
+        return new Matrix2x2(this.xa * matrix.xa + this.xb * matrix.ya, 
+            this.ya * matrix.xa + this.yb * matrix.ya, this.xa * matrix.xb + this.xb * matrix.yb, this.ya * matrix.xb + this.yb * matrix.yb);
     }
 }
 
@@ -368,7 +409,8 @@ class Matrix3x3 extends Matrix
     constructor(vector_a: Vector3D, vector_b: Vector3D, vector_c: Vector3D)
     constructor(data: number[])
     constructor(data: matrix_data)
-    constructor(xaOrVec1OrData?: number | Vector3D | number[] | matrix_data, yaOrVec2?: number | Vector3D, zaOrVec3?: number | Vector3D,
+    constructor(matrix: Matrix3x3)
+    constructor(xaOrVec1OrData?: number | Vector3D | number[] | matrix_data | Matrix3x3, yaOrVec2?: number | Vector3D, zaOrVec3?: number | Vector3D,
         xb?: number, yb?: number, zb?: number,
         xc?: number, yc?: number, zc?: number)
     {
@@ -376,8 +418,7 @@ class Matrix3x3 extends Matrix
         if ((typeof xaOrVec1OrData === "number") && (typeof yaOrVec2 === "number") && (typeof zaOrVec3 === "number") &&
             (typeof xb === "number") && (typeof yb === "number") && (typeof zb === "number") &&
             (typeof xc === "number") && (typeof yc === "number") && (typeof zc === "number"))
-        {
-            //constructor 2
+        {            
             this.xa = xaOrVec1OrData;
             this.ya = yaOrVec2;
             this.za = zaOrVec3;
@@ -393,7 +434,6 @@ class Matrix3x3 extends Matrix
             {
                 if ((typeof yaOrVec2 === "object") && (typeof zaOrVec3 === "object"))
                 {
-                    //constructor 3
                     this.xa = xaOrVec1OrData.x;
                     this.ya = xaOrVec1OrData.y;
                     this.za = xaOrVec1OrData.z;
@@ -406,7 +446,6 @@ class Matrix3x3 extends Matrix
                 }
             } else if ("xa" in xaOrVec1OrData)
             {
-                //constructor 5
                 if ((typeof xaOrVec1OrData.za !== "undefined") && (typeof xaOrVec1OrData.zb !== "undefined") && (typeof xaOrVec1OrData.xc !== "undefined") &&
                     (typeof xaOrVec1OrData.yc !== "undefined") && (typeof xaOrVec1OrData.zc !== "undefined"))
                 {
@@ -420,7 +459,19 @@ class Matrix3x3 extends Matrix
                     this.yc = xaOrVec1OrData.yc;
                     this.zc = xaOrVec1OrData.zc;
                 }
-            } else
+            } else if (xaOrVec1OrData instanceof Matrix3x3)
+            {
+                this.xa = xaOrVec1OrData.xa;
+                this.ya = xaOrVec1OrData.ya;
+                this.za = xaOrVec1OrData.za;
+                this.xb = xaOrVec1OrData.xb;
+                this.yb = xaOrVec1OrData.yb;
+                this.zb = xaOrVec1OrData.zb;
+                this.xc = xaOrVec1OrData.xc;
+                this.yc = xaOrVec1OrData.yc;
+                this.zc = xaOrVec1OrData.zc;
+            }
+            else
             {
                 this.xa = xaOrVec1OrData[0];
                 this.ya = xaOrVec1OrData[1];
@@ -448,6 +499,16 @@ class Matrix3x3 extends Matrix
     {
         return new Matrix3x3(this.xa * factor, this.ya * factor, this.za * factor, this.xb * factor, this.yb * factor, this.zb * factor,
             this.xc * factor, this.yc * factor, this.zc * factor);
+    }
+    multiply_by_vector(vector: Vector3D): Vector3D 
+    {
+        return new Vector3D(this.xa * vector.x + this.xb * vector.y + this.xc * vector.z,
+            this.ya * vector.x + this.yb * vector.y + this.yc * vector.z,
+            this.za * vector.x + this.zb * vector.y + this.zc * vector.z);
+    }
+    multiply_by_matrix(matrix: Matrix3x3): Matrix3x3 
+    {
+        return new Matrix3x3();
     }
 }
 
@@ -477,7 +538,8 @@ class Matrix4x4 extends Matrix
     constructor(vector_a: Vector4D, vector_b: Vector4D, vector_c: Vector4D, vector_d: Vector4D)
     constructor(data: number[])
     constructor(data: matrix_data)
-    constructor(xaOrVec1OrData?: number | Vector4D | number[] | matrix_data, yaOrVec2?: number | Vector4D, zaOrVec3?: number | Vector4D, waOrVec3?: number | Vector4D,
+    constructor(matrix: Matrix4x4)
+    constructor(xaOrVec1OrData?: number | Vector4D | number[] | matrix_data | Matrix4x4, yaOrVec2?: number | Vector4D, zaOrVec3?: number | Vector4D, waOrVec3?: number | Vector4D,
         xb?: number, yb?: number, zb?: number, wb?: number,
         xc?: number, yc?: number, zc?: number, wc?: number,
         xd?: number, yd?: number, zd?: number, wd?: number)
@@ -488,7 +550,6 @@ class Matrix4x4 extends Matrix
         (typeof xc === "number") && (typeof yc === "number") && (typeof zc === "number") && (typeof wc === "number") &&
         (typeof xd === "number") && (typeof yd === "number") && (typeof zd === "number") && (typeof wd === "number"))
         {
-            //constructor 2
             this.xa = xaOrVec1OrData;
             this.ya = yaOrVec2;
             this.za = zaOrVec3;
@@ -511,7 +572,6 @@ class Matrix4x4 extends Matrix
             {
                 if ((typeof yaOrVec2 == "object") && (typeof zaOrVec3 === "object") && (typeof waOrVec3 === "object"))
                 {
-                    //constructor 3
                     this.xa = xaOrVec1OrData.x;
                     this.ya = xaOrVec1OrData.y;
                     this.za = xaOrVec1OrData.z;
@@ -536,7 +596,6 @@ class Matrix4x4 extends Matrix
                 (typeof xaOrVec1OrData.yc !== "undefined") && (typeof xaOrVec1OrData.zc !== "undefined") && (typeof xaOrVec1OrData.xd !== "undefined") &&
                 (typeof xaOrVec1OrData.yd !== "undefined") && (typeof xaOrVec1OrData.zd !== "undefined") && (typeof xaOrVec1OrData.wd !== "undefined"))
                 {
-                    //constructor 5
                     this.xa = xaOrVec1OrData.xa;
                     this.ya = xaOrVec1OrData.ya;
                     this.za = xaOrVec1OrData.za;
@@ -554,9 +613,27 @@ class Matrix4x4 extends Matrix
                     this.zd = xaOrVec1OrData.zd;
                     this.wd = xaOrVec1OrData.wd;
                 }
-            } else
+            } else if (xaOrVec1OrData instanceof Matrix4x4)
             {
-                //constructor 4
+                this.xa = xaOrVec1OrData.xa;
+                this.ya = xaOrVec1OrData.ya;
+                this.za = xaOrVec1OrData.za;
+                this.wa = xaOrVec1OrData.wa;
+                this.xb = xaOrVec1OrData.xb;
+                this.yb = xaOrVec1OrData.yb;
+                this.zb = xaOrVec1OrData.zb;
+                this.wb = xaOrVec1OrData.wb;
+                this.xc = xaOrVec1OrData.xc;
+                this.yc = xaOrVec1OrData.yc;
+                this.zc = xaOrVec1OrData.zc;
+                this.wc = xaOrVec1OrData.wc;
+                this.xd = xaOrVec1OrData.xd;
+                this.yd = xaOrVec1OrData.yd;
+                this.zd = xaOrVec1OrData.zd;
+                this.wd = xaOrVec1OrData.wd;    
+            } 
+            else
+            {
                 this.xa = xaOrVec1OrData[0];
                 this.ya = xaOrVec1OrData[1];
                 this.za = xaOrVec1OrData[2];
@@ -597,6 +674,17 @@ class Matrix4x4 extends Matrix
             this.xb * factor, this.yb * factor, this.zb * factor, this.wb * factor,
             this.xc * factor, this.yc * factor, this.zc * factor, this.wc * factor,
             this.xd * factor, this.yd * factor, this.zd * factor, this.wd * factor);
+    }
+    multiply_by_vector(vector: Vector4D): Vector4D 
+    {
+        return new Vector4D(this.xa * vector.x + this.xb + vector.y + this.xc * vector.z + this.xd * vector.w,
+            this.ya * vector.x + this.yb * vector.y + this.yc * vector.z + this.yd * vector.w,
+            this.za * vector.x + this.zb * vector.y + this.zc * vector.z + this.zd * vector.w,
+            this.wa * vector.x + this.wb * vector.y + this.wc * vector.z + this.wd * vector.w);
+    }
+    multiply_by_matrix(matrix: Matrix4x4): Matrix4x4 
+    {
+        return new Matrix4x4();
     }
 }
 
