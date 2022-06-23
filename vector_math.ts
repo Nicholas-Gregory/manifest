@@ -356,11 +356,18 @@ class Matrix2x2 extends Matrix
 {
     constructor()
     constructor(data: Vector2D[])
-    constructor(data?: Vector2D[])
+    constructor(vector1: Vector2D, vector2: Vector2D)
+    constructor(dataOrVec1?: Vector2D[] | Vector2D, vector2?: Vector2D)
     {
-        if (typeof data === "object")
+        if (typeof dataOrVec1 === "object")
         {
-            super(data);
+            if (("x" in dataOrVec1) && (vector2 instanceof Vector2D))
+            {
+                super([dataOrVec1, vector2]);
+            } else
+            {
+                super(dataOrVec1 as Vector2D[]);
+            }
         } else
         {
             super()            
@@ -376,17 +383,35 @@ class Matrix2x2 extends Matrix
             throw "Undefined matrix data";
         }
     }
+    multiply_matrix(matrix: Matrix2x2): Matrix2x2
+    {
+        if ((typeof this.data !== "undefined") && (typeof matrix.data !== "undefined"))
+        {
+            return new Matrix2x2(this.multiply_vector(matrix.data[0] as Vector2D), this.multiply_vector(matrix.data[1] as Vector2D));
+        } else
+        {
+            console.log("No matrix data on multiply_matrix call, probably unintended");
+            return new Matrix2x2();
+        }
+    }
 }
 
 class Matrix3x3 extends Matrix
 {
     constructor()
     constructor(data: Vector3D[])
-    constructor(data?: Vector3D[])
+    constructor(vector1: Vector3D, vector2: Vector3D, vector3: Vector3D)
+    constructor(dataOrVec1?: Vector3D[] | Vector3D, vector2?: Vector3D, vector3?: Vector3D)
     {
-        if (typeof data === "object")
+        if (typeof dataOrVec1 === "object")
         {
-            super(data);
+            if (("x" in dataOrVec1) && (vector2 instanceof Vector3D) && (vector3 instanceof Vector3D))
+            {
+                super([dataOrVec1, vector2, vector3]);
+            } else
+            {
+                super(dataOrVec1 as Vector3D[]);
+            }
         } else
         {
             super();
@@ -402,17 +427,35 @@ class Matrix3x3 extends Matrix
             throw "Undefined matrix data";
         }
     }
+    multiply_matrix(matrix: Matrix3x3): Matrix3x3
+    {
+        if ((typeof this.data !== "undefined") && (typeof matrix.data !== "undefined"))
+        {
+            return new Matrix3x3(this.multiply_vector(matrix.data[0] as Vector3D), this.multiply_vector(matrix.data[1] as Vector3D), this.multiply_vector(matrix.data[2] as Vector3D));
+        } else
+        {
+            console.log("No matrix data on multiply_matrix call, probably unintended");
+            return new Matrix3x3();
+        }
+    }
 }
 
 class Matrix4x4 extends Matrix
 {
     constructor()
-    constructor(data: Vector3D[])
-    constructor(data?: Vector3D[])
+    constructor(data: Vector4D[])
+    constructor(vector1: Vector4D, vector2: Vector4D, vector3: Vector4D, vector4: Vector4D)
+    constructor(dataOrVec1?: Vector4D[] | Vector4D, vector2?: Vector4D, vector3?: Vector4D, vector4?: Vector4D)
     {
-        if (typeof data === "object")
+        if (typeof dataOrVec1 === "object")
         {
-            super(data);
+            if (("x" in dataOrVec1) && (vector2 instanceof Vector4D) && (vector3 instanceof Vector4D) && (vector4 instanceof Vector4D))
+            {
+                super([dataOrVec1, vector2, vector3, vector4]);
+            } else
+            {
+                super(dataOrVec1 as Vector4D[]);
+            }
         } else
         {
             super();
@@ -426,6 +469,17 @@ class Matrix4x4 extends Matrix
         } else
         {
             throw "Undefined matrix data";
+        }
+    }
+    multiply_matrix(matrix: Matrix4x4): Matrix4x4
+    {
+        if ((typeof this.data !== "undefined") && (typeof matrix.data !== "undefined"))
+        {
+            return new Matrix4x4(this.multiply_vector(matrix.data[0] as Vector4D), this.multiply_vector(matrix.data[1] as Vector4D), this.multiply_vector(matrix.data[2] as Vector4D), this.multiply_vector(matrix.data[3] as Vector4D))
+        } else
+        {
+            console.log("Nu matrix data on multiply_matrix call, probably unintended");
+            return new Matrix4x4();
         }
     }
 }
