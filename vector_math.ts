@@ -8,6 +8,7 @@ abstract class Vector
     abstract negate(): Vector;
     abstract dot_product(vector: Vector): number;
     abstract equals(vector: Vector): boolean;
+    abstract distance(vector: Vector): number;
     angle(vector: Vector): number
     {
         return Math.acos(this.normalize().dot_product(vector.normalize()));
@@ -92,6 +93,12 @@ class Vector2D extends Vector
     equals(vector: Vector2D): boolean 
     {
         return (this.x === vector.x) && (this.y === vector.y);
+    }
+    distance(vector: Vector2D): number 
+    {
+        let diff_x = this.x - vector.x;
+        let diff_y = this.y - vector.y;
+        return Math.sqrt(diff_x*diff_x + diff_y*diff_y);
     }
 }
 
@@ -184,6 +191,13 @@ class Vector3D extends Vector
     {
         return (this.x === vector.x) && (this.y === vector.y) && (this.z === vector.z);
     }
+    distance(vector: Vector3D): number 
+    {
+        let diff_x = this.x - vector.x;
+        let diff_y = this.y - vector.y;
+        let diff_z = this.z - vector.z;
+        return Math.sqrt(diff_x*diff_x + diff_y*diff_y + diff_z*diff_z);
+    }
 }
 
 class Vector4D extends Vector
@@ -275,6 +289,14 @@ class Vector4D extends Vector
     equals(vector: Vector4D): boolean 
     {
         return (this.x === vector.x) && (this.y === vector.y) && (this.z === vector.z) && (this.w === vector.w);
+    }
+    distance(vector: Vector4D): number 
+    {
+        let diff_x = this.x - vector.x;
+        let diff_y = this.y - vector.y;
+        let diff_z = this.z - vector.z;
+        let diff_w = this.w - vector.w;
+        return Math.sqrt(diff_x*diff_x + diff_y*diff_y + diff_z*diff_z + diff_w*diff_w);
     }
 }
 
@@ -478,20 +500,14 @@ class Matrix4x4 extends Matrix
             return new Matrix4x4(this.multiply_vector(matrix.data[0] as Vector4D), this.multiply_vector(matrix.data[1] as Vector4D), this.multiply_vector(matrix.data[2] as Vector4D), this.multiply_vector(matrix.data[3] as Vector4D))
         } else
         {
-            console.log("Nu matrix data on multiply_matrix call, probably unintended");
+            console.log("No matrix data on multiply_matrix call, probably unintended");
             return new Matrix4x4();
         }
     }
 }
 
-//tests
-let vec2 = new Vector2D(2, 3);
-console.log("Initialized via values in constructor: x: " + vec2.x + " y: " + vec2.y);
-vec2 = new Vector2D();
-vec2.x = 4; 
-vec2.y = 5;
-console.log("Initialized after constructor call: x: " + vec2.x + " y: " + vec2.y);
-vec2 = new Vector2D([1, 2]);
-console.log("Initialized with array: x: " + vec2.x + " y: " + vec2.y);
-vec2 = new Vector2D({x: 5, y: 6});
-console.log("Initialized with object: x: " + vec2.x + " y: " + vec2.y);
+export 
+{
+    Vector, Vector2D, Vector3D, Vector4D,
+    Matrix, Matrix2x2, Matrix3x3, Matrix4x4
+}
