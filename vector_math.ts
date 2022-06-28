@@ -1,302 +1,132 @@
-abstract class Vector
+class Vector
 {
-    abstract get_length(): number;
-    abstract normalize(): Vector;
-    abstract add_elements(vector: Vector): Vector;
-    abstract subtract_elements(vector: Vector): Vector;
-    abstract scale(factor: number): Vector;
-    abstract negate(): Vector;
-    abstract dot_product(vector: Vector): number;
-    abstract equals(vector: Vector): boolean;
-    abstract distance(vector: Vector): number;
-    angle(vector: Vector): number
-    {
-        return Math.acos(this.normalize().dot_product(vector.normalize()));
-    }
+    protected data: number[];
     constructor()
+    constructor(vector: Vector)
+    constructor(data: number[])
+    constructor(data_or_vector?: Vector | number[])
     {
-
+        if (data_or_vector instanceof Vector)
+        {
+            this.data = data_or_vector.data;
+        } else if (data_or_vector)
+        {
+            this.data = data_or_vector;
+        } else
+        {
+            this.data = [];
+        }
     }
-}
-
-interface vector_data
-{
-    x: number;
-    y: number;
-    z?: number;
-    w?: number;
+    add_elements(vector: Vector): Vector
+    {
+        let new_vector = new Vector();
+        if (this.data.length === vector.data.length)
+        {            
+            for (let i = 0; i < this.data.length; i++)
+            {
+                new_vector.data.push(this.data[i] + vector.data[i]);
+            }
+        } else
+        {
+            throw "Cannot add vectors of differing lengths";
+        }
+        return new_vector;
+    }
+    scale(factor: number): Vector
+    {
+        let new_vector = new Vector();
+        for (let i = 0; i < this.data.length; i++)
+        {
+            new_vector.data.push(this.data[i] * factor);
+        }
+        return new_vector;
+    }
 }
 
 class Vector2D extends Vector
-{
-    x: number = 0;
-    y: number = 0;
+{            
     constructor()
-    constructor(x: number, y: number)
-    constructor(data: vector_data)
-    constructor(data: number[])
     constructor(vector: Vector2D)
-    constructor(xOrData?: number | vector_data | number[] | Vector2D, y?: number)
+    constructor(data: number[])
+    constructor(data_or_vector?: Vector2D | number[])
     {
-        super();
-        if ((typeof xOrData === "number") && (typeof y === "number")) {
-            this.x = xOrData;
-            this.y = y;
-        } else if (typeof xOrData === "object")
+        if (data_or_vector)
         {
-            if ("x" in xOrData)
-            {
-                this.x = xOrData.x;
-                this.y = xOrData.y;
-            } else if(xOrData instanceof Vector2D)
-            {
-                this.x = xOrData.x;
-                this.y = xOrData.y;
-            } 
-            else 
-            {
-                this.x = xOrData[0];
-                this.y = xOrData[1];
-            }
+            super(data_or_vector as Vector);
+        } else
+        {
+            super();
         }
     }
-    get_length(): number 
+    get x()
     {
-        return Math.sqrt((this.x * this.x) + (this.y * this.y));
+        return this.data[0];
     }
-    normalize(): Vector2D 
+    get y()
     {
-        let mag = this.get_length();
-        return new Vector2D(this.x / mag, this.y / mag);
-    }
-    add_elements(vector: Vector2D): Vector2D 
-    {
-        let result = new Vector2D(this.x + vector.x, this.y + vector.y);
-        return result;
-    }
-    subtract_elements(vector: Vector2D): Vector2D 
-    {
-        return new Vector2D(this.x - vector.x, this.y - vector.y);
-    }
-    scale(factor: number): Vector2D 
-    {
-        return new Vector2D(this.x * factor, this.y * factor);
-    }
-    negate(): Vector2D 
-    {
-        return this.scale(-1);
-    }
-    dot_product(vector: Vector2D): number 
-    {
-        return this.x * vector.x + this.y * vector.y;
-    }
-    equals(vector: Vector2D): boolean 
-    {
-        return (this.x === vector.x) && (this.y === vector.y);
-    }
-    distance(vector: Vector2D): number 
-    {
-        let diff_x = this.x - vector.x;
-        let diff_y = this.y - vector.y;
-        return Math.sqrt(diff_x*diff_x + diff_y*diff_y);
+        return this.data[1];
     }
 }
 
 class Vector3D extends Vector
 {
-    x: number = 0;
-    y: number = 0;
-    z: number = 0;
     constructor()
-    constructor(data: vector_data)
-    constructor(data: number[])
-    constructor(x: number, y: number, z: number)
     constructor(vector: Vector3D)
-    constructor(xOrData?: number | vector_data |  number[] | Vector3D, y?:number, z?: number)
+    constructor(data: number[])
+    constructor(data_or_vector?: Vector3D | number[])
     {
-        super();
-        if ((typeof xOrData === "number") && (typeof y === "number") && (typeof z === "number"))
+        if (data_or_vector)
         {
-            this.x = xOrData;
-            this.y = y;
-            this.z = z;
-        } else if (typeof xOrData === "object")
+            super(data_or_vector as Vector);
+        } else
         {
-            if ("x" in xOrData)
-            {
-                if (typeof xOrData.z !== "undefined")
-                {
-                    this.x = xOrData.x;
-                    this.y = xOrData.y;
-                    this.z = xOrData.z;
-                } else
-                {
-                    throw "3D vectors require a z component";
-                }
-            } else if (xOrData instanceof Vector3D)
-            {
-                this.x = xOrData.x;
-                this.y = xOrData.y;
-                this.z = xOrData.z;
-            } 
-            else 
-            {
-                if (xOrData.length === 3)
-                {
-                    this.x = xOrData[0];
-                    this.y = xOrData[1];
-                    this.z = xOrData[2];
-                } else
-                {
-                    throw "3D vectors require 3 components";
-                }
-            }
+            super();
         }
     }
-    get_length(): number 
+    get x()
     {
-        return Math.sqrt((this.x * this.x) + (this.y * this.y) + (this.x * this.x));
+        return this.data[0];
     }
-    normalize(): Vector3D 
+    get y()
     {
-        let mag = this.get_length();
-        return new Vector3D(this.x / mag, this.y / mag, this.z / mag);
+        return this.data[1];
     }
-    add_elements(vector: Vector3D): Vector3D 
+    get z()
     {
-        let result = new Vector3D(this.x + vector.x, this.y + vector.y, this.z + vector.z);
-        return result;
-    }
-    subtract_elements(vector: Vector3D): Vector3D 
-    {
-        return new Vector3D(this.x - vector.x, this.y - vector.y, this.z - vector.z);
-    }
-    scale(factor: number): Vector3D 
-    {
-        return new Vector3D(this.x * factor, this.y * factor, this.z * factor);
-    }
-    negate(): Vector3D 
-    {
-        return this.scale(-1);
-    }
-    cross_product(vector: Vector3D): Vector3D
-    {
-        return new Vector3D(this.y * vector.z - this.z * vector.y, this.z * vector.x - this.x * vector.z, this.x * vector.y - this.y * vector.x);
-    }
-    dot_product(vector: Vector3D): number 
-    {
-        return this.x * vector.x + this.y * vector.y + this.z * vector.z;
-    }
-    equals(vector: Vector3D): boolean 
-    {
-        return (this.x === vector.x) && (this.y === vector.y) && (this.z === vector.z);
-    }
-    distance(vector: Vector3D): number 
-    {
-        let diff_x = this.x - vector.x;
-        let diff_y = this.y - vector.y;
-        let diff_z = this.z - vector.z;
-        return Math.sqrt(diff_x*diff_x + diff_y*diff_y + diff_z*diff_z);
+        return this.data[2];
     }
 }
 
 class Vector4D extends Vector
 {
-    x: number = 0;
-    y: number = 0;
-    z: number = 0;
-    w: number = 0;
     constructor()
-    constructor(data: vector_data)
-    constructor(data: number[])
-    constructor(x: number, y: number, z: number, w: number)
     constructor(vector: Vector4D)
-    constructor(xOrData?: number | vector_data | number[] | Vector4D, y?: number, z?: number, w?: number)
+    constructor(data: number[])
+    constructor(data_or_vector?: Vector4D | number[])
     {
-        super();
-        if ((typeof xOrData === "number") && (typeof y === "number") && (typeof z === "number") && (typeof w === "number"))
+        if (data_or_vector)
         {
-            this.x = xOrData;
-            this.y = y;
-            this.z = z;
-            this.w = w;
-        } else if (typeof xOrData === "object")
+            super(data_or_vector as Vector);
+        } else
         {
-            if ("x" in xOrData)
-            {
-                if ((typeof xOrData.z !== "undefined") && (typeof xOrData.w !== "undefined"))
-                {
-                    this.x = xOrData.x;
-                    this.y = xOrData.y;
-                    this.z = xOrData.z;
-                    this.w = xOrData.w;
-                } else
-                {
-                    throw "4D vectors require a z and w component";
-                }
-            } else if (xOrData instanceof Vector4D)
-            {
-                this.x = xOrData.x;
-                this.y = xOrData.y;
-                this.z = xOrData.z;
-                this.w = xOrData.w;
-            } 
-            else
-            {
-                if (xOrData.length === 4)
-                {
-                    this.x = xOrData[0];
-                    this.y = xOrData[1];
-                    this.z = xOrData[2];
-                    this.w = xOrData[3];
-                } else
-                {
-                    throw "4D vectors require 4 components";
-                }
-            }
+            super();
         }
     }
-    get_length(): number 
+    get x()
     {
-        return Math.sqrt((this.x * this.x) + (this.y * this.y) + (this.z * this.z) + (this.w * this.w)); 
+        return this.data[0];
     }
-    normalize(): Vector4D 
+    get y()
     {
-        let mag = this.get_length();
-        return new Vector4D(this.x / mag, this.y / mag, this.z / mag, this.w / mag);
+        return this.data[1];
     }
-    add_elements(vector: Vector4D): Vector4D 
+    get z()
     {
-        let result = new Vector4D(this.x + vector.x, this.y + vector.y, this.z + vector.z, this.w + vector.w);
-        return result;
+        return this.data[2];
     }
-    subtract_elements(vector: Vector4D): Vector4D 
+    get w()
     {
-        return new Vector4D(this.x - vector.x, this.y - vector.y, this.z - vector.z, this.w - vector.w);    
-    }
-    scale(factor: number): Vector4D 
-    {
-        return new Vector4D(this.x * factor, this.y * factor, this.z * factor, this.w * factor);
-    }
-    negate(): Vector4D 
-    {
-        return this.scale(-1);
-    }
-    dot_product(vector: Vector4D): number 
-    {
-        return this.x * vector.x + this.y * vector.y + this.z * vector.z + this.w * vector.w;    
-    }
-    equals(vector: Vector4D): boolean 
-    {
-        return (this.x === vector.x) && (this.y === vector.y) && (this.z === vector.z) && (this.w === vector.w);
-    }
-    distance(vector: Vector4D): number 
-    {
-        let diff_x = this.x - vector.x;
-        let diff_y = this.y - vector.y;
-        let diff_z = this.z - vector.z;
-        let diff_w = this.w - vector.w;
-        return Math.sqrt(diff_x*diff_x + diff_y*diff_y + diff_z*diff_z + diff_w*diff_w);
+        return this.data[3];
     }
 }
 
